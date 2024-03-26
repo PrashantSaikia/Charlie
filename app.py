@@ -13,12 +13,10 @@ REPO_ID = "TheBloke/SOLAR-10.7B-Instruct-v1.0-uncensored-GGUF"
 FILENAME = "solar-10.7b-instruct-v1.0-uncensored.Q4_K_M.gguf"
 SYSTEM_PROMPT = "You are a helpful assistant that answers user queries to the best of your ability."
 
-
 def load_llm(repo_id: str = REPO_ID, filename: str = FILENAME, **kwargs):
     model_path = hf_hub_download(repo_id=repo_id, filename=filename)
     llm = LlamaCpp(model_path=model_path, **kwargs)
     return llm
-
 
 def callback(contents: str, user: str, instance: pn.chat.ChatInterface):
     message = ""
@@ -27,7 +25,6 @@ def callback(contents: str, user: str, instance: pn.chat.ChatInterface):
         message += token
         yield message
     memory.save_context(inputs, {"output": message})
-
 
 model = load_llm(
     repo_id=REPO_ID,
@@ -56,15 +53,6 @@ chain = (
     | output_parser
 )
 
-# chat_interface = pn.chat.ChatInterface(
-#     pn.chat.ChatMessage(
-#         "Ask me anything!", user="Solar"
-#     ),
-#     callback=callback,
-#     callback_user="Solar",
-# )
-# chat_interface.servable()
-
 chat_interface = pn.chat.ChatInterface(
     callback=callback, 
     callback_user="Charlie",
@@ -86,7 +74,5 @@ chat_interface.send(
     respond = False,
 )
 
-
 template = pn.template.BootstrapTemplate(title="Charlie 🕵🏻‍♂️", favicon="Charlie_Logo.png", header_background = "#000000", main=[chat_interface])
-
 template.servable()
